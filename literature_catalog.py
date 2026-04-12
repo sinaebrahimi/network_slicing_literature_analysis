@@ -26,11 +26,11 @@ from html import unescape
 # ============================================================
 # CONFIGURATION
 # ============================================================
-LITERATURE_DIR = Path(
-    r"C:\Users\ebrahimis\OneDrive - Coventry University\PhD\Literature"
-)
-OUTPUT_CSV = Path(os.path.expanduser("~/Documents/literature_catalog.csv"))
-PUBLISHED_PREPRINTS_LOG = Path(os.path.expanduser("~/Documents/published_preprints.txt"))
+PROJECT_DIR = Path(__file__).resolve().parent
+
+LITERATURE_DIR = Path(os.environ.get("LITERATURE_DIR", PROJECT_DIR / "Literature"))
+OUTPUT_CSV = PROJECT_DIR / "litreview.csv"
+PUBLISHED_PREPRINTS_LOG = PROJECT_DIR / "published_preprints.txt"
 
 SEMANTIC_SCHOLAR_DELAY = 0.4
 CROSSREF_DELAY = 0.3
@@ -41,10 +41,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s",
     handlers=[
         logging.StreamHandler(),
-        logging.FileHandler(
-            os.path.expanduser("~/Documents/literature_catalog.log"),
-            encoding="utf-8",
-        ),
+        logging.FileHandler(PROJECT_DIR / "literature_catalog.log", encoding="utf-8"),
     ],
 )
 log = logging.getLogger(__name__)
