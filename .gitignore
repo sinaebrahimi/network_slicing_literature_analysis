@@ -1,24 +1,32 @@
-# add the /lit_venv folder to gitignore
-/lit_venv/
-# Virtual environment
+# Virtual environments
+.venv/
+venv/
+env/
 lit_venv/
- 
-# Python
+
+# Python bytecode and caches
 __pycache__/
 *.pyc
 *.pyo
- 
-# Jupyter checkpoints
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Jupyter
 .ipynb_checkpoints/
- 
+
 # Logs
 *.log
- 
+
+# Generated analysis artifacts
+*.png
+
 # OS files
 .DS_Store
 Thumbs.db
 desktop.ini
- 
+
 # IDE
 .vscode/
 .idea/
