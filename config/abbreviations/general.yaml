@@ -1,0 +1,20 @@
+# General-purpose abbreviations that most fields use the same way.
+# Add this file to a project's "abbreviations:" list only if you want them in filenames.
+# Format:   Phrase: SHORT     (see network_slicing.yaml for the full rules)
+
+Artificial Intelligence: AI
+Machine Learning: ML
+Deep Learning: DL
+Neural Network: NN
+Neural Networks: NNs
+Convolutional Neural Network: CNN
+Graph Neural Network: GNN
+Graph Neural Networks: GNNs
+Natural Language Processing: NLP
+Large Language Model: LLM
+Large Language Models: LLMs
+Internet of Things: IoT
+State of the Art: SotA
+Proof of Concept: PoC
+Systematic Literature Review: SLR
+Randomized Controlled Trial: RCT

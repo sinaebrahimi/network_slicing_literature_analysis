@@ -1,0 +1,21 @@
+From: ScienceDirect <sciencedirect@notification.elsevier.com>
+To: researcher@example.com
+Subject: New articles available in Computer Networks
+Date: Tue, 13 Oct 2026 09:00:00 +0000
+Message-ID: <sd-0001@notification.elsevier.com>
+MIME-Version: 1.0
+Content-Type: multipart/alternative; boundary="b1"
+
+--b1
+Content-Type: text/plain; charset="utf-8"
+
+New articles in Computer Networks (see HTML version)
+--b1
+Content-Type: text/html; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+
+<html><body><table><tr><td><h2>Computer Networks</h2><p>Volume 270, December 2026</p></td></tr>
+<tr><td style=3D"padding:8px"><a href=3D"https://click.notification.elsevier.com/CL0/https:%2F%2Fwww.sciencedirect.com%2Fscience%2Farticle%2Fpii%2FS1389128626004321%3Fdgcid%3Dcoauthor/1/0100abc/xyz=3D">Joint admission control and resource allocation for network slicing using constrained deep reinforcement learning</a><br><span>Research article, 112233</span><br><span>A. Kumar, S. Weber</span></td></tr>
+<tr><td style=3D"padding:8px"><a href=3D"https://click.notification.elsevier.com/CL0/https:%2F%2Fwww.sciencedirect.com%2Fscience%2Farticle%2Fpii%2FS1389128626009999%3Fdgcid%3Dcoauthor/1/0100abc/xyz=3D">A survey on blockchain for supply chain finance and logistics</a><br><span>Review article</span><br><span>R. Silva</span></td></tr>
+<tr><td><a href=3D"https://click.notification.elsevier.com/CL0/https:%2F%2Fwww.sciencedirect.com%2Fjournal%2Fcomputer-networks/1/x">View all articles in this issue</a> | <a href=3D"https://www.elsevier.com/unsubscribe?x=3D1">Unsubscribe from these alerts</a></td></tr></table></body></html>
+--b1--

@@ -1,0 +1,48 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "litsuite"
+version = "2.0.0"
+description = "Keep a research literature library up to date: PDF catalogs, abstract enrichment, email-alert paper discovery, automatic downloading and renaming, and an analysis dashboard."
+readme = "README.md"
+license = { text = "MIT" }
+authors = [{ name = "Sina Ebrahimi" }]
+requires-python = ">=3.9"
+dependencies = [
+    "requests>=2.31",
+    "PyYAML>=6.0",
+    "beautifulsoup4>=4.12",
+]
+
+[project.optional-dependencies]
+# Analysis dashboard (Jupyter notebook)
+dashboard = ["pandas>=2.0", "matplotlib>=3.7", "seaborn>=0.12", "wordcloud>=1.9", "numpy>=1.24", "jupyter>=1.0"]
+# Store passwords/tokens in the operating system's credential store
+keyring = ["keyring>=24"]
+# Browser automation for institutional (paywalled) downloads
+browser = ["playwright>=1.45"]
+# Gmail API and Google Drive
+google = ["google-api-python-client>=2.100", "google-auth-oauthlib>=1.0", "google-auth-httplib2>=0.1"]
+# Outlook / Microsoft 365 mail and OneDrive (Microsoft Graph)
+microsoft = ["msal>=1.24"]
+# Dropbox
+dropbox = ["dropbox>=11.36"]
+all = [
+    "litsuite[dashboard,keyring,browser,google,microsoft,dropbox]",
+]
+dev = ["pytest>=7"]
+
+[project.scripts]
+litsuite = "litsuite.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["litsuite*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "online: needs internet access to scholarly APIs (deselect with -m 'not online')",
+    "browser: needs Playwright + Chromium",
+]

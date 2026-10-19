@@ -1,0 +1,57 @@
+# Venue name -> short name used in filenames.
+#
+# You rarely need to edit this: litsuite first learns short names from your own catalog
+# (every DOI carries a stable venue code: 10.1109/TNSM..., 10.1016/j.comnet..., 10.1007/s10922...),
+# then uses IEEE's own codes (TNSM, ICC, GLOBECOM...), then the acronym in the venue name
+# ("... Conference on Communications (ICC)"), then the initials ("Journal of Network and
+# Systems Management" -> JNSM). Use this file for venues where those guesses are wrong.
+#
+# Matching ignores case, punctuation, years, ordinals ("29th"), "Proceedings of the", IEEE/ACM and
+# small words, so "Proceedings of the 29th Annual International Conference on Mobile Computing and
+# Networking" matches the MobiCom line below. Names must match completely; start a name with ~ to
+# match it anywhere inside a longer venue name (e.g.  "~Mobile Computing and Networking": MobiCom).
+# A key may also be a DOI venue code, e.g.  "10.1016/future": FGCS
+#
+# Format:   Venue name: SHORT
+
+# ---- ACM (ACM DOIs carry no venue code) ----
+Proceedings of the ACM on Measurement and Analysis of Computing Systems: POMACS
+Proceedings of the ACM on Networking: PACMNET
+Annual International Conference on Mobile Computing and Networking: MobiCom
+ACM SIGCOMM Computer Communication Review: CCR
+ACM Computing Surveys: CSUR
+ACM Transactions on Networking: TNET
+IEEE/ACM Transactions on Networking: TNET
+International Symposium on Theory, Algorithmic Foundations, and Protocol Design for Mobile Networks and Mobile Computing: MobiHoc
+Conference on emerging Networking EXperiments and Technologies: CoNEXT
+
+# ---- Elsevier journals whose initials are ambiguous ----
+Computer Networks: jcomnet
+Computer Communications: jcomcom
+Journal of Network and Computer Applications: JNCA
+Future Generation Computer Systems: FGCS
+Ad Hoc Networks: jadhoc
+Physical Communication: jphycom
+Vehicular Communications: VEHCOM
+
+# ---- Springer / Wiley / others ----
+Journal of Network and Systems Management: JNSM
+EURASIP Journal on Wireless Communications and Networking: JWCN
+Wireless Networks: WINET
+Mobile Networks and Applications: MONET
+Annals of Telecommunications: ANTE
+Journal of Supercomputing: jsupercomputing
+Telecommunication Systems: TELS
+International Journal of Communication Systems: DAC
+Transactions on Emerging Telecommunications Technologies: ETT
+Scientific Reports: srep
+Nature Communications: NatCommun
+Proceedings of the National Academy of Sciences of the United States of America: PNAS
+
+# ---- Conferences often listed without an acronym ----
+USENIX Symposium on Networked Systems Design and Implementation: NSDI
+European Conference on Networks and Communications: EuCNC
+International Conference on Network and Service Management: CNSM
+Network Operations and Management Symposium: NOMS
+Conference on Network Softwarization: NetSoft
+Conference on Computer Communications: INFOCOM

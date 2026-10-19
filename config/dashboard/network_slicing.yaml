@@ -1,0 +1,49 @@
+# Dashboard vocabulary for the network_slicing project (used by litreview_dashboard.ipynb).
+# Other projects can have their own file (set `dashboard: {file: ...}` in settings.yaml);
+# without one, the notebook builds these lists from the project's keywords and abbreviations.
+
+# Canonical term: [variants counted as that term] (lower case; substring match on title + abstract)
+compound_terms:
+  network slicing: [network slicing, network slice, network slices]
+  resource allocation: [resource allocation, resource management]
+  deep reinforcement learning: [deep reinforcement learning, deep rl]
+  reinforcement learning: [reinforcement learning]
+  quality of service: [quality of service, qos]
+  machine learning: [machine learning]
+  service level agreement: [service level agreement, sla]
+  virtual network function: [virtual network function, vnf, vnfs]
+  software defined networking: [software defined networking, sdn]
+  network function virtualization: [network function virtualization, nfv]
+  radio access network: [radio access network, ran]
+  open ran: [open ran, o-ran, oran]
+  end-to-end: [end to end, end-to-end, e2e]
+  multi-agent: [multi agent, multi-agent, multiagent, agentic, marl, ma-drl, madrl, multi-agent reinforcement learning,
+                multi-agent deep reinforcement learning]
+  edge computing: [edge computing, mec, mobile edge computing, fog comupting, edge-to-cloud, edge-to-cloud continuum]
+  admission control: [admission control]
+  cloud computing: [cloud, cloud computing, cloud-based, cloud native]
+  digital twin: [digital twin]
+  intent-based: [intent based, intent-based]
+  federated learning: [federated learning]
+  transfer learning: [transfer learning]
+  graph neural network: [graph neural network, gnn]
+  deep neural network: [deep neural network, dnn]
+  proximal policy optimization: [proximal policy optimization, ppo]
+  soft actor-critic: [soft actor-critic, sac]
+  deep deterministic policy gradient: [deep deterministic policy gradient, ddpg]
+  safe reinforcement learning: [safe reinforcement learning, safe rl]
+  constrained reinforcement learning: [constrained reinforcement learning, constrained rl]
+  masked reinforcement learning: [masked reinforcement learning, masked rl, masked ppo, masked sac, masked ddpg,
+                                  masked safe rl, masked constrained rl]
+
+trend_topics: [network slicing, reinforcement learning, deep reinforcement learning, resource allocation, open ran,
+               edge computing, digital twin, federated learning, multi-agent, admission control, end-to-end,
+               machine learning, graph neural network, intent-based, transfer learning]
+
+# Venue short names -> type, for rows whose catalog 'pub_type' column is empty (older entries).
+journals: [TNSM, ACCESS, TVT, TMC, JIOT, JSAC, TNET, TWC, TCCN, OJCOMS, MCOM, LCOMM, MNET, JNCA, JOCN, LNET, TNSE,
+           COMST, WCL, MWC, jcomnet, jcomcom, CST, FGCS, MONET, PPNA, SENSORS, NETWORK, ELECTRONICS, electronics,
+           JNSM, IOTJ, TII, TITS, TCOM, CL, OJVT, JSYST, PIEEE, ETT, CCPE, OSN, CLUSTER]
+conferences: [ICC, GLOBECOM, INFOCOM, CNSM, NOMS, CCNC, EuCNC, NetSoft, WCNC, VTC, PIMRC, CAMAD, CSCN, NoF, 5GWF,
+              5GNet, 5G-MeMU, CNERT, HPSR, NFV-SDN, IM, MedComNet, CloudNet, AINA, ICNP, CloudCom, CCGRID,
+              TCCN_conf, MSN, ICIN, DRCN, ECOC, ONDM, OFC]

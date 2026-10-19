@@ -1,0 +1,194 @@
+# =====================================================================================
+#  litsuite settings  (copy this file to config/settings.yaml and edit it)
+#
+#    cp config/settings.example.yaml config/settings.yaml        (macOS / Linux)
+#    copy config\settings.example.yaml config\settings.yaml      (Windows)
+#
+#  or run `litsuite init` for a guided setup.
+#  config/settings.yaml is in .gitignore, so your paths and addresses stay private.
+#  Passwords and tokens are NEVER written here (they go to your OS keychain; see README).
+#  Relative paths below are relative to the repository folder.
+# =====================================================================================
+
+user:
+  name: "Your Name"
+  # Sent to CrossRef / OpenAlex as a polite contact and REQUIRED by Unpaywall (open-access PDF finder).
+  email: "you@university.ac.uk"
+
+# -------------------------------------------------------------------------------------
+# Settings shared by every project (each project can override any of them).
+# -------------------------------------------------------------------------------------
+defaults:
+  recursive: ask                 # include PDFs in subfolders? true | false | ask (asks each time)
+  naming:
+    template: "{venue} {yy} {author} - {title}"     # -> MNET 25 Fryganiotis - Model_Predictive_..._NS.pdf
+    template_no_author: "{venue} {yy} - {title}"
+    word_separator: "_"          # "_" like IEEE downloads, or " " for spaces
+    colon_replacement: ""        # "SafeSlice: Enabling" -> "SafeSlice_Enabling"  ("-" gives "SafeSlice-_Enabling")
+    ascii_only: true             # Gonçalves -> Goncalves (safe on every OS / cloud)
+    max_title_length: 150
+    preprint_label: PREP         # venue used for arXiv/TechRxiv/... preprints
+  alerts:
+    since_days: 14               # how far back to read alert emails
+    mode: ask                    # ask = you pick from a list | auto = download by score | report = never download
+    min_score: 2.0               # candidates below this are not shown
+    auto_download_score: 4.0     # 'auto' mode downloads at or above this (and pre-selects them in 'ask' mode)
+    max_downloads: 25            # per run
+    download_folder: ""          # subfolder for new papers, e.g. "_new" to review them first ("" = top level)
+
+# -------------------------------------------------------------------------------------
+# Projects: one per research area. Each has its own folder, catalog, keywords, abbreviations.
+# Use them with:  litsuite <command> --project <name>
+# -------------------------------------------------------------------------------------
+projects:
+
+  network_slicing:
+    description: "5G/6G network slicing, resource allocation, multi-agent DRL"
+
+    # Where the PDFs are. Any of:
+    #   "C:/Users/me/OneDrive - Coventry University/PhD/Literature"   (Windows; / or \\ both fine)
+    #   "~/Documents/Literature"                                       (macOS / Linux)
+    #   "{onedrive}/PhD/Literature"   OneDrive desktop folder on whatever computer you are using
+    #                                 (also {onedrive_business} {onedrive_personal} {gdrive} {dropbox} {icloud} {box})
+    #   "dropbox:/Research/Literature"      Dropbox API          (litsuite login cloud dropbox)
+    #   "gdrive:/Research/Literature"       Google Drive API     (litsuite login cloud gdrive)
+    #   "onedrive:/Documents/Literature"    OneDrive API         (litsuite login cloud onedrive)
+    #   "rclone:myremote:Research/Literature"  any rclone remote (Box, pCloud, MEGA, S3, Nextcloud...)
+    # A list of several folders is also allowed (new downloads go to the first one).
+    library: "{onedrive_business}/PhD/Literature"
+    recursive: true              # e.g. also read the 'Surveys' subfolder
+    exclude_folders: ["_old", "Unsorted"]   # subfolder names or patterns to skip
+    include_folders: []          # if not empty: only these subfolders (plus the top level)
+
+    data_dir: projects/network_slicing      # catalog, reports, backups for this project
+    catalog: litreview.csv
+
+    # Title abbreviations used in filenames (and understood when matching keywords).
+    # Files are merged in order; see config/abbreviations/network_slicing.yaml.
+    abbreviations:
+      - config/abbreviations/network_slicing.yaml
+    abbreviations_inline: {}     # quick extra entries, e.g. {"Digital Twin": "DT"}
+
+    # Venue short names. Learned automatically from your catalog (TNSM, jcomnet, FGCS...);
+    # add rules for new venues in these files.
+    venues:
+      - config/venues/common.yaml
+    venue_doi_styles:
+      "10.1016": "j{code}"       # Elsevier journals as jcomnet / jcomcom / jnca (your existing style)
+
+    keywords:
+      focus:                     # 1-3 core topics: strong weight
+        - network slicing
+        - resource allocation
+        - multi-agent reinforcement learning
+      secondary:                 # up to ~10 related topics
+        - deep reinforcement learning
+        - O-RAN
+        - service level agreement
+        - admission control
+        - 6G
+        - edge computing
+        - digital twin
+        - federated learning
+        - graph neural network
+        - safe reinforcement learning
+      exclude: []                # e.g. ["optical", "satellite"] to never see those
+      use_learned: true          # also use projects/network_slicing/learned_keywords.yaml (litsuite keywords suggest --save)
+      use_library_similarity: true
+
+    scoring:                     # optional fine-tuning (defaults shown in README)
+      require_focus: false
+
+    alerts:
+      accounts: [uni-outlook]    # names from email_accounts below
+      sources: [google_scholar, sciencedirect, ieee, acm, springer, wiley, mdpi, arxiv]
+      mode: ask
+
+    dashboard:                   # vocabulary for litreview_dashboard.ipynb (terms, heatmap topics, venue types)
+      file: config/dashboard/network_slicing.yaml   # without it, the notebook uses your focus + secondary keywords
+
+  # A second, unrelated research area stays completely separate:
+  # protein_design:
+  #   description: "Computational protein design"
+  #   library: "{gdrive}/Papers/Protein"
+  #   recursive: ask
+  #   abbreviations: [config/abbreviations/general.yaml]
+  #   keywords:
+  #     focus: [protein design, structure prediction]
+  #     secondary: [diffusion model, AlphaFold, molecular dynamics]
+  #   alerts:
+  #     accounts: [personal-gmail]
+
+# -------------------------------------------------------------------------------------
+# Email accounts that receive your alerts (Google Scholar, ScienceDirect, IEEE, ACM...).
+# Sign in once per account:  litsuite login email <name>
+#
+# Only UNREAD emails from the alert senders are ever opened; emails you have already read
+# are never touched. Reading does not change an email's state. Set  mark_as_read: true
+# on an account to have litsuite mark the alerts it processed as read at the end of a run
+# (this needs write permission, so sign in again after changing it).
+# -------------------------------------------------------------------------------------
+email_accounts:
+
+  uni-outlook:                   # University / work Microsoft 365, or @outlook.com / @hotmail.com
+    provider: outlook
+    address: "you@university.ac.uk"
+    client_id: ""                # Azure app ID (README > "Outlook / Microsoft 365", 5 minutes)
+    tenant: organizations        # organizations | consumers (personal accounts) | common | <tenant id>
+    mark_as_read: false          # true = mark processed alerts as read (requests Mail.ReadWrite)
+
+  personal-gmail:                # Gmail via Google's API (read-only)
+    provider: gmail
+    address: "you@gmail.com"
+    client_secret_file: "~/.litsuite/google_client_secret.json"   # README > "Gmail"
+
+  gmail-imap:                    # simplest Gmail option: IMAP + app password
+    provider: imap
+    host: imap.gmail.com
+    port: 993
+    username: "you@gmail.com"
+    folders: ["INBOX"]           # add "[Gmail]/All Mail" to include archived mail
+    mark_as_read: false
+
+  saved-alerts:                  # no login at all: a folder of saved .eml/.mbox/.html alert emails
+    provider: folder
+    path: "~/Documents/AlertEmails"
+
+# Add or override alert senders (built-in: google_scholar, sciencedirect, ieee, acm, springer,
+# wiley, mdpi, arxiv, semantic_scholar). 'subjects' (optional) must appear in the subject line.
+alert_sources: {}
+#  my_journal_toc:
+#    senders: ["toc@journals.example.org", "@alerts.example.org"]
+#    parser: generic             # generic | google_scholar | arxiv
+#    subjects: ["table of contents"]
+
+# -------------------------------------------------------------------------------------
+# Access to paywalled PDFs (open-access copies are always tried first).
+# Sign in once:  litsuite login publisher all      (a browser opens; use your university login)
+# -------------------------------------------------------------------------------------
+access:
+  open_access_first: true
+  method: browser                # browser | none  (none = open access only)
+  institution: "Coventry University"   # text that publishers show when you have access
+  # Optional shortcuts. Ask your library or see README > "Institutional access":
+  idp_entity_id: ""              # SAML entityID, e.g. https://idp.example.ac.uk/shibboleth -> one-click sign-in pages
+  ezproxy_prefix: ""             # e.g. https://ezproxy.example.ac.uk/login?url=
+  openathens_domain: ""          # e.g. example.ac.uk  (go.openathens.net/redirector/<domain>)
+  browser:
+    profile: default             # stored in ~/.litsuite/browser/<profile>
+    headless: true               # false = watch the downloads happen (useful if a site blocks headless browsers)
+    channel: ""                  # "chrome" or "msedge" to use your installed browser instead of Playwright's Chromium
+    timeout_seconds: 60
+  publishers: {}                 # override URL templates or add publishers (see litsuite/fetch/publishers.py)
+
+# -------------------------------------------------------------------------------------
+# Cloud storage API credentials (only needed for dropbox:/ gdrive:/ onedrive:/ libraries).
+# -------------------------------------------------------------------------------------
+cloud:
+  dropbox:
+    app_key: ""                  # README > "Dropbox"
+  gdrive:
+    client_secret_file: "~/.litsuite/google_client_secret.json"   # can be the same file as for Gmail
+  onedrive:
+    client_id: ""                # can be the same Azure app as for Outlook
+    tenant: common

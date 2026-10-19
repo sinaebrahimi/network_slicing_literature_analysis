@@ -1,7 +1,26 @@
+# Everything (same as: pip install -e ".[all]"). For a minimal install use: pip install -e .
+# Core
+requests>=2.31
+PyYAML>=6.0
+beautifulsoup4>=4.12
+# Dashboard notebook
 pandas>=2.0
 matplotlib>=3.7
 seaborn>=0.12
 wordcloud>=1.9
-requests>=2.31
-jupyter>=1.0
 numpy>=1.24
+jupyter>=1.0
+# Passwords in the OS credential store
+keyring>=24
+# Institutional downloads through a browser (then run: python -m playwright install chromium)
+playwright>=1.45
+# Gmail API / Google Drive
+google-api-python-client>=2.100
+google-auth-oauthlib>=1.0
+google-auth-httplib2>=0.1
+# Outlook / Microsoft 365 mail, OneDrive
+msal>=1.24
+# Dropbox
+dropbox>=11.36
+# Tests
+pytest>=7

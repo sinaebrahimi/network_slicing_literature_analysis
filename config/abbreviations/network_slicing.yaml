@@ -1,0 +1,47 @@
+# Abbreviations for the "network_slicing" project.
+#
+# Used when litsuite builds a filename for a new paper, e.g.
+#   "Model Predictive Control-Based Dynamic Resource Allocation Enabler for Resilient Network Slicing"
+#   -> "Model_Predictive_Control-Based_Dynamic_RA_Enabler_for_Resilient_NS"
+# and, in reverse, when matching alert titles against your keywords (DRL == deep reinforcement learning).
+#
+# Format:   Phrase: SHORT
+# - Matching ignores case and treats spaces, underscores and hyphens alike
+#   ("Network Slicing", "network-slicing" and "Network_Slicing" all become NS).
+# - Longer phrases are applied first, so the order of lines does not matter.
+# - To keep a phrase spelled out, delete or comment out its line (#), or map it to "".
+# - Preview the effect on any title:   litsuite abbrev test "Your title here"
+# - Re-learn from your filenames:       litsuite abbrev learn --project network_slicing
+#
+# The entries below were learned from the existing library (counts = files using them).
+
+Network Slicing: NS                                   # 104 files
+Network Slice: NS                                     # 13
+Network Slices: NS                                    # 4
+Deep Reinforcement Learning: DRL                      # 23
+Multi-Agent Deep Reinforcement Learning: MA-DRL
+Multiagent Deep Reinforcement Learning: MA-DRL
+Multi-Agent Reinforcement Learning: MARL              # 5
+Reinforcement Learning: RL                            # 12
+End-to-End: E2E                                       # 19
+Resource Allocation: RA                               # 18
+Radio Access Network: RAN                             # 3
+Radio Access Networks: RAN                            # 2
+Multi-Access Edge Computing: MEC                      # 2
+Mobile Edge Computing: MEC
+Machine Learning: ML                                  # 3
+Federated Learning: FL
+Service Function Chain: SFC
+Service Function Chaining: SFC
+Service Level Agreement: SLA
+Virtual Network Function: VNF
+Virtual Network Functions: VNFs
+Network Function Virtualization: NFV
+Software-Defined Networking: SDN
+Large Language Model: LLM
+Large Language Models: LLMs
+Unmanned Aerial Vehicle: UAV
+Unmanned Aerial Vehicles: UAVs
+Internet of Things: IoT                               # 2
+Proof of Concept: PoC                                 # 2
+Beyond 5G: B5G

@@ -9,6 +9,9 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
+*.egg-info/
+build/
+dist/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
@@ -18,9 +21,27 @@ __pycache__/
 
 # Logs
 *.log
+logs/
 
-# Generated analysis artifacts
+# Your personal settings (paths, email addresses). Secrets are never stored in the repo.
+config/settings.yaml
+settings.yaml
+
+# Per-project working files (state, backups, temporary downloads, run reports)
+projects/*/.state/
+projects/*/backups/
+projects/*/logs/
+projects/*/reports/
+projects/*/*.before-rebuild-*.csv
+# ...and the same folders when litsuite runs without a project (--folder/--output) in the repo root
+/backups/
+/reports/
+/.state/
+*.tmp
+
+# Generated analysis artifacts (project figures are kept)
 *.png
+!projects/*/figures/*.png
 
 # OS files
 .DS_Store
