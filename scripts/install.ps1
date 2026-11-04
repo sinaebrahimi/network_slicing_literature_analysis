@@ -8,6 +8,11 @@ python -m venv .venv
 python -m pip install --upgrade pip
 python -m pip install -e ".[all]"
 python -m playwright install chromium
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "WARNING: could not download the browser for institutional downloads."
+    Write-Host "         Everything else works. Retry later with: python -m playwright install chromium"
+    Write-Host "         (or set access.browser.channel: msedge in config\settings.yaml to use Microsoft Edge)."
+}
 if (-not (Test-Path config\settings.yaml)) {
     Copy-Item config\settings.example.yaml config\settings.yaml
     Write-Host "Created config\settings.yaml - edit it (or run: litsuite init)."

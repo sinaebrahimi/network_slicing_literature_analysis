@@ -94,6 +94,30 @@ class _Handler(http.server.BaseHTTPRequestHandler):
                     '<input id="username" name="username"><input id="password" name="password" type="password">'
                     '<button type="submit">Sign in</button></form></body></html>')
             return self._send(200, html.encode())
+        if path.startswith("/jsredir/"):                      # ScienceDirect "pdfft": JS redirect to the PDF
+            aid = path.rsplit("/", 1)[1]
+            return self._send(200, f"<html><body><script>window.location.href='/pdf/{aid}';</script></body></html>".encode())
+        if path == "/ms/login":                                # Microsoft Entra style: username, then password
+            step = (qs.get("step") or ["1"])[0]
+            if step == "1":
+                html = ('<html><body><form method="post" action="/ms/login?step=2"><input type="email" name="loginfmt">'
+                        '<input type="submit" id="idSIButton9" value="Next"></form></body></html>')
+            else:
+                html = ('<html><body><form method="post" action="/ms/login?step=3"><input type="password" name="passwd">'
+                        '<input type="submit" id="idSIButton9" value="Sign in"></form></body></html>')
+            return self._send(200, html.encode())
+        if path == "/ezproxy/login":                            # EZproxy: one sign-in, then proxied access
+            target = (qs.get("url") or ["/home"])[0]
+            if "ez=ok" in (self.headers.get("Cookie") or ""):
+                return self._send(302, b"", headers={"Location": target})
+            html = (f'<html><body><form method="post" action="/ezproxy/login?url={urllib.parse.quote(target, safe="")}">'
+                    '<input name="user"><input name="pass" type="password"><button type="submit">Login</button>'
+                    '</form></body></html>')
+            return self._send(200, html.encode())
+        if path.startswith("/proxied/pdf/"):
+            if "ez=ok" not in (self.headers.get("Cookie") or ""):
+                return self._send(403, b"forbidden")
+            return self._send(200, pdf_bytes("EZPROXY"), "application/pdf")
         if path == "/home":
             text = "Access provided by: Example University" if self._logged_in() else "Institutional Sign In"
             return self._send(200, f"<html><body><p>{text}</p></body></html>".encode())
@@ -103,6 +127,17 @@ class _Handler(http.server.BaseHTTPRequestHandler):
         url = urllib.parse.urlparse(self.path)
         length = int(self.headers.get("Content-Length") or 0)
         form = urllib.parse.parse_qs(self.rfile.read(length).decode())
+        if url.path == "/ms/login":
+            step = (urllib.parse.parse_qs(url.query).get("step") or ["2"])[0]
+            if step == "2" and form.get("loginfmt") == ["alice@uni.ac.uk"]:
+                return self._send(302, b"", headers={"Location": "/ms/login?step=2",
+                                                      "Set-Cookie": "msuser=alice; Path=/"})
+            if step == "3" and form.get("passwd") == ["secret"] and "msuser=alice" in (self.headers.get("Cookie") or ""):
+                return self._send(302, b"", headers={"Location": "/home", "Set-Cookie": "session=ok; Path=/; Max-Age=86400"})
+            return self._send(403, b"bad credentials")
+        if url.path == "/ezproxy/login" and form.get("user") == ["alice"] and form.get("pass") == ["secret"]:
+            target = (urllib.parse.parse_qs(url.query).get("url") or ["/home"])[0]
+            return self._send(302, b"", headers={"Location": target, "Set-Cookie": "ez=ok; Path=/; Max-Age=86400"})
         if url.path == "/login" and form.get("username") == ["alice"] and form.get("password") == ["secret"]:
             nxt = (urllib.parse.parse_qs(url.query).get("next") or ["/home"])[0]
             return self._send(302, b"", headers={"Location": nxt, "Set-Cookie": "session=ok; Path=/; Max-Age=86400"})
@@ -124,6 +159,28 @@ def publisher_server():
 def no_proxy_for_localhost(monkeypatch):
     monkeypatch.setenv("NO_PROXY", "127.0.0.1,localhost")
     monkeypatch.setenv("no_proxy", "127.0.0.1,localhost")
+
+
+@pytest.fixture(scope="session")
+def virtual_display():
+    """A virtual screen (Xvfb) so headed browser windows (the sign-in flow) can open."""
+    import os
+    import subprocess
+    import time
+
+    if os.environ.get("DISPLAY"):
+        yield os.environ["DISPLAY"]
+        return
+    if not shutil.which("Xvfb"):
+        pytest.skip("Xvfb not available for headed-browser tests")
+    display = ":97"
+    proc = subprocess.Popen(["Xvfb", display, "-screen", "0", "1280x900x24", "-nolisten", "tcp"],
+                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(1.0)
+    os.environ["DISPLAY"] = display
+    yield display
+    os.environ.pop("DISPLAY", None)
+    proc.terminate()
 
 
 def chromium_available() -> bool:

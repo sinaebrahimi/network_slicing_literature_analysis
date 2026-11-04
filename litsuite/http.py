@@ -52,7 +52,8 @@ class Http:
         if not delay:
             return
         with self._lock:
-            wait = self._last.get(host, 0) + delay - time.monotonic()
+            last = self._last.get(host)
+            wait = (last + delay - time.monotonic()) if last is not None else 0
             if wait > 0:
                 time.sleep(wait)
             self._last[host] = time.monotonic()

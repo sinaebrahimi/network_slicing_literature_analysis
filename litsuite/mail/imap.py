@@ -8,6 +8,7 @@ Settings::
         provider: imap
         host: imap.example.ac.uk     # Gmail: imap.gmail.com   iCloud: imap.mail.me.com
         port: 993
+        security: ssl                # ssl (port 993, default) or starttls (port 143)
         username: me@example.ac.uk
         folders: [INBOX]             # Gmail: add "[Gmail]/All Mail" to include archived mail
 
@@ -22,6 +23,7 @@ from __future__ import annotations
 import datetime as dt
 import imaplib
 import logging
+import ssl
 
 from litsuite.mail.base import Mailbox, parse_mime, sender_matches
 from litsuite.secrets import get_secret
@@ -37,7 +39,7 @@ class ImapMailbox(Mailbox):
     def __init__(self, cfg: dict, password: str | None = None, imap_factory=None):
         self.name = cfg.get("name", "imap")
         self.host = cfg.get("host") or "imap.gmail.com"
-        self.port = int(cfg.get("port") or 993)
+        self.port = int(cfg.get("port") or (143 if str(cfg.get("security", "")).lower() == "starttls" else 993))
         self.username = cfg.get("username") or cfg.get("address")
         self.folders = cfg.get("folders") or [cfg.get("folder") or "INBOX"]
         self.password = password or get_secret(secret_key(self.name))
@@ -45,9 +47,19 @@ class ImapMailbox(Mailbox):
             raise ValueError(f"email account '{self.name}': set 'username'")
         if not self.password:
             raise PermissionError(f"No password stored for '{self.name}'. Run: litsuite login email {self.name}")
-        factory = imap_factory or (lambda: imaplib.IMAP4_SSL(self.host, self.port))
-        self.conn = factory()
+        self.security = str(cfg.get("security") or "ssl").lower()
+        if self.security not in ("ssl", "starttls"):
+            raise ValueError(f"email account '{self.name}': security must be 'ssl' (port 993) or 'starttls' (port 143)")
+        self.conn = (imap_factory or self._connect)()
         self.conn.login(self.username, self.password)
+
+    def _connect(self):
+        ctx = ssl.create_default_context()   # certificates are always verified
+        if self.security == "starttls":
+            conn = imaplib.IMAP4(self.host, self.port, timeout=60)
+            conn.starttls(ssl_context=ctx)
+            return conn
+        return imaplib.IMAP4_SSL(self.host, self.port, ssl_context=ctx, timeout=60)
 
     @staticmethod
     def _quote(folder: str) -> str:

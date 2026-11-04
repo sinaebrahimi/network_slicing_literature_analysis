@@ -51,3 +51,8 @@ desktop.ini
 # IDE
 .vscode/
 .idea/
+
+# Test coverage data
+.coverage
+.coverage.*
+htmlcov/

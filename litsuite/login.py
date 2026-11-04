@@ -11,7 +11,8 @@ from litsuite.secrets import get_secret, set_secret, token_path
 SSO_USER, SSO_PASS = "sso:username", "sso:password"
 
 
-def login_email(settings, account: str, input_fn=input, password_fn=getpass.getpass, printer=print) -> str:
+def login_email(settings, account: str, input_fn=input, password_fn=None, printer=print) -> str:
+    password_fn = password_fn or getpass.getpass
     cfg = settings.email_account(account)
     provider = (cfg.get("provider") or "").lower()
     if provider == "imap":
@@ -36,7 +37,8 @@ def login_email(settings, account: str, input_fn=input, password_fn=getpass.getp
     raise ValueError(f"unknown provider '{provider}' for account '{account}'")
 
 
-def store_sso_credentials(input_fn=input, password_fn=getpass.getpass) -> str:
+def store_sso_credentials(input_fn=input, password_fn=None) -> str:
+    password_fn = password_fn or getpass.getpass
     user = input_fn("University username / email: ").strip()
     pw = password_fn("University password (input hidden): ")
     set_secret(SSO_USER, user)

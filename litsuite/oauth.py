@@ -10,11 +10,13 @@
 from __future__ import annotations
 
 import json
+import logging
 from pathlib import Path
 
 from litsuite.secrets import secure_write, token_path
 
 GRAPH = "https://graph.microsoft.com/v1.0"
+log = logging.getLogger(__name__)
 
 
 class AuthError(Exception):
@@ -80,7 +82,8 @@ def google_credentials(client_secret_file: str, scopes: list, cache_name: str, i
             creds.refresh(Request())
             secure_write(path, creds.to_json())
             return creds
-        except Exception:
+        except Exception as e:   # revoked / expired refresh token: a new sign-in is needed
+            log.warning("Google sign-in for '%s' could not be refreshed: %s", cache_name, e)
             creds = None
     if not interactive:
         raise AuthError(f"Not signed in to Google for '{cache_name}'. Run: litsuite login ...")

@@ -32,7 +32,7 @@ from litsuite.keywords import build_scorer
 from litsuite.mail import open_mailbox
 from litsuite.mail.parsers import AlertCandidate, all_sources, match_source, parse_message
 from litsuite.metadata import (PaperMeta, arxiv_by_id, complete, crossref_by_doi, crossref_by_pii,
-                               crossref_search, s2_by_id, s2_search)
+                               crossref_search, identify_landing_page, s2_by_id, s2_search)
 from litsuite.naming import build_filename, parse_filename, unique_name
 from litsuite.textutils import title_key, title_similarity
 
@@ -188,6 +188,7 @@ def mark_handled_as_read(settings, handled: dict, mailbox_factory=open_mailbox, 
 
 def resolve_metadata(c: AlertCandidate, http=None, online: bool = True) -> PaperMeta:
     meta = None
+    by_title_search = False   # a fuzzy title match is checked below; identifier lookups are authoritative
     if online:
         if c.doi:
             meta = crossref_by_doi(c.doi, http)
@@ -203,9 +204,19 @@ def resolve_metadata(c: AlertCandidate, http=None, online: bool = True) -> Paper
                     meta.merge(s2)
         if meta is None and c.pii:
             meta = crossref_by_pii(c.pii, http)
-        if meta is None:
+        if meta is None and c.url and not c.pdf_url and (c.ieee_arnumber or not c.title):
+            page = identify_landing_page(c.url, http)       # e.g. an IEEE Xplore link without a DOI
+            if page.get("doi"):
+                c.doi = c.doi or page["doi"]
+                meta = crossref_by_doi(page["doi"], http)
+            if not c.title and page.get("title"):
+                c.title = page["title"]
+            if meta is not None and page.get("abstract") and not meta.abstract:
+                meta.abstract = page["abstract"]
+        if meta is None and c.title:
             meta = crossref_search(c.title, c.authors[0] if c.authors else "", c.year, http) \
                 or s2_search(c.title, http=http)
+            by_title_search = meta is not None
     fallback = PaperMeta(title=c.title, authors=list(c.authors), year=c.year or c.message_date[:4],
                          venue_full=c.venue_line,
                          doi=c.doi, abstract=c.snippet if len(c.snippet) > 300 else "", arxiv_id=c.arxiv_id,
@@ -216,7 +227,7 @@ def resolve_metadata(c: AlertCandidate, http=None, online: bool = True) -> Paper
         meta = fallback
     else:
         meta.merge(fallback)
-        if title_similarity(meta.title, c.title) < 0.6:   # lookup found something else: trust the email
+        if by_title_search and title_similarity(meta.title, c.title) < 0.6:   # found something else: trust the email
             meta = fallback
     if online:
         meta = complete(meta, http)
@@ -234,6 +245,10 @@ def process_candidate(d: Decision, project, ctx: dict) -> None:
     c = d.candidate
     meta = resolve_metadata(c, ctx.get("http"), ctx.get("online", True))
     d.doi = meta.doi
+    d.links = [u for u in [c.url, f"https://doi.org/{meta.doi}" if meta.doi else ""] if u]
+    if not (meta.title or c.title):
+        d.status, d.note = "needs_manual", "could not identify this paper (no title or DOI found)"
+        return
     dup = ctx["library"].find(meta.title, meta.doi)
     if dup is not None:
         d.status, d.note = "in_library", f"already in library as {dup.get('filename')}"
@@ -253,7 +268,6 @@ def process_candidate(d: Decision, project, ctx: dict) -> None:
     ids = {"doi": meta.doi, "arnumber": c.ieee_arnumber, "pii": c.pii, "arxiv_id": meta.arxiv_id or c.arxiv_id,
            "url": c.url}
     res = ctx["downloader"].download(meta, tmp, ids=ids, direct_pdf=c.pdf_url, use_browser=ctx.get("use_browser", True))
-    d.links = [u for u in [c.url, f"https://doi.org/{meta.doi}" if meta.doi else ""] if u]
     if not res.ok:
         d.status, d.note = "needs_manual", res.note
         return

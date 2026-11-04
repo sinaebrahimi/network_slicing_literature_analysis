@@ -330,6 +330,34 @@ def abstract_from_html(html: str, final_url: str = "") -> str:
     return ""
 
 
+def identify_landing_page(url: str, http: Http | None = None) -> dict:
+    """DOI and title of the article shown at ``url`` (publisher page without a DOI in its URL).
+
+    Reads the standard ``citation_doi`` / ``dc.identifier`` / ``citation_title`` meta tags
+    and IEEE Xplore's embedded document metadata."""
+    http = http or default_http()
+    r = http.get(url, timeout=25, allow_redirects=True)
+    if r is None or r.status_code != 200:
+        return {}
+    html = r.text
+    doi = ""
+    for name in ("citation_doi", "dc.identifier", "DC.Identifier", "prism.doi", "bepress_citation_doi"):
+        val = _extract_meta(html, name)
+        m = re.search(r"10\.\d{4,9}/\S+", val or "")
+        if m:
+            doi = normalize_doi(m.group(0))
+            break
+    if not doi:
+        m = re.search(r'"doi"\s*:\s*"(10\.\d{4,9}/[^"]+)"', html)   # IEEE xplGlobal.document.metadata
+        doi = normalize_doi(m.group(1)) if m else ""
+    title = clean_text(_extract_meta(html, "citation_title") or _extract_meta(html, "og:title", "property")
+                       or _extract_meta(html, "dc.title"))
+    if not title:
+        m = re.search(r'"(?:formulaStrippedArticleTitle|title)"\s*:\s*"((?:[^"\\]|\\.)*)"', html)
+        title = clean_text(m.group(1)) if m else ""
+    return {"doi": doi, "title": title, "abstract": abstract_from_html(html, r.url)}
+
+
 def doi_page_abstract(doi: str, http: Http | None = None) -> str:
     http = http or default_http()
     r = http.get(f"https://doi.org/{normalize_doi(doi)}", timeout=25, allow_redirects=True)

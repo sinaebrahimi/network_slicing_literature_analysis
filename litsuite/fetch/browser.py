@@ -82,9 +82,14 @@ class BrowserSession:
         except Exception as e:
             self._pw.stop()
             self._pw = None
-            raise RuntimeError(f"Could not start the browser ({str(e).splitlines()[0]}). Install it with:\n"
-                               "  python -m playwright install chromium\n"
-                               "or set access.browser.channel to 'chrome' / 'msedge' in settings.yaml.") from e
+            msg = str(e)
+            if not self.headless and ("XServer" in msg or "DISPLAY" in msg):
+                hint = ("Signing in opens a browser window, so run this command on a computer with a screen "
+                        "(your laptop/desktop), not on a headless server. Downloads afterwards can run headless.")
+            else:
+                hint = ("Install the browser with:\n  python -m playwright install chromium\n"
+                        "or set access.browser.channel to 'chrome' / 'msedge' in settings.yaml.")
+            raise RuntimeError(f"Could not start the browser ({msg.splitlines()[0]}). {hint}") from e
         self.context.set_default_timeout(self.timeout)
         return self
 

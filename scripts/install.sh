@@ -9,7 +9,11 @@ PY="${PYTHON:-python3}"
 . .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -e ".[all]"
-python -m playwright install chromium
+if ! python -m playwright install chromium; then
+  echo "WARNING: could not download the browser for institutional downloads."
+  echo "         Everything else works. Retry later with: python -m playwright install chromium"
+  echo "         (or set access.browser.channel: chrome in config/settings.yaml to use Google Chrome)."
+fi
 if [ ! -f config/settings.yaml ]; then
   cp config/settings.example.yaml config/settings.yaml
   echo "Created config/settings.yaml - edit it (or run: litsuite init)."

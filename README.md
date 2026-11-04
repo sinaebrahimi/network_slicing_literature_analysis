@@ -466,6 +466,8 @@ gmail-imap:
 
 The same `provider: imap` works for Yahoo (`imap.mail.yahoo.com`, app password), iCloud
 (`imap.mail.me.com`, app-specific password), Fastmail, and university mail servers that allow IMAP.
+Servers that use port 143 with STARTTLS instead of port 993 need `security: starttls`.
+Certificates are always verified.
 
 ### Gmail: official Gmail API (read-only, no password stored)
 
@@ -701,11 +703,25 @@ network_slicing_literature_analysis/
 └── pyproject.toml, requirements.txt
 ```
 
-**Tests:** `pip install -e ".[all]" && pytest`. The suite runs offline: email parsing against
-sample alerts, every mail and cloud provider against fakes of their APIs, and a local fake
-publisher that requires a login. Real Chromium signs in to it, keeps the session across browser
-restarts and downloads PDFs. Several tests also run on the real 706-paper catalog (filename parsing,
-abbreviation and venue learning, relevance scoring, dashboard loading).
+**Tests:** `pip install -e ".[all]" && pip install responses pymap keyrings.alt && pytest`
+(about 2 minutes). Every component is exercised through its real code and real client libraries;
+only the remote services are replaced:
+
+| Area | How it is tested |
+|---|---|
+| Catalog, naming, abbreviations, venues, keywords | unit and end-to-end tests, several on the real 706-paper catalog |
+| CrossRef / Semantic Scholar / OpenAlex / arXiv / Unpaywall / publisher pages | real `requests` stack with recorded-style API responses (`responses`) |
+| IMAP | a real IMAP server (pymap) over STARTTLS and implicit TLS with certificate checks; unread-only and mark-as-read verified on the server |
+| Gmail, Google Drive | the real Google API client (bundled discovery documents, resumable upload) |
+| Outlook, OneDrive | real MSAL device-code sign-in and token cache, Microsoft Graph paging and chunked upload |
+| Dropbox | the official Dropbox SDK, including its PKCE sign-in and token refresh |
+| rclone | the real rclone binary (local backend and an env-configured remote) |
+| Publisher access | real Chromium against a local fake publisher: form, Microsoft two-step and EZproxy sign-in (visible window on a virtual screen), session reuse after restart, iframe, `citation_pdf_url`, JavaScript-redirect and attachment PDFs |
+| Commands and scripts | the installed `litsuite` command as a subprocess (stdin answers), v1 wrapper scripts, `run_alerts.sh`, a clean `scripts/install.sh` run, the dashboard notebook executed end to end |
+| Secrets | a real keyring backend, environment variables, private-file fallback |
+
+`pytest -m online` additionally checks the real CrossRef, Semantic Scholar, OpenAlex, arXiv,
+Unpaywall and IEEE services (it skips itself when they are unreachable).
 
 **Data sources** (free, no API keys): [CrossRef](https://www.crossref.org/),
 [Semantic Scholar](https://www.semanticscholar.org/), [OpenAlex](https://openalex.org/),

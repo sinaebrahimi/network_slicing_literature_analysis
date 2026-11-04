@@ -42,7 +42,15 @@ include = ["litsuite*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+addopts = "-m 'not online'"
 markers = [
     "online: needs internet access to scholarly APIs (deselect with -m 'not online')",
     "browser: needs Playwright + Chromium",
+    "slow: takes minutes (e.g. the clean install test)",
 ]
+
+[tool.coverage.run]
+source = ["litsuite"]
+concurrency = ["thread", "greenlet"]   # Playwright's sync API runs on greenlets
+parallel = true
+patch = ["subprocess"]                 # also measure `litsuite` started as a subprocess
